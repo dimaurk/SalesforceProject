@@ -1,0 +1,29 @@
+public with sharing class NewContactController
+{
+    private String LinkToPage;
+    private Contact newContact {get; set;}
+    
+    public NewContactController(ApexPages.StandardController controller)
+    {
+       	this.newContact = (Contact)controller.getRecord(); 
+        this.LinkToPage = ApexPages.currentPage().getHeaders().get('Referer');
+    }
+    
+    public Pagereference ContactSave()
+    {
+   		insert newContact;
+		return redirect();
+    }
+
+    public Pagereference PageCancel()
+    {
+		return redirect();
+    }
+    
+    private Pagereference redirect()
+    {
+        PageReference pageRef = new PageReference(LinkToPage);
+        pageRef.setRedirect(true);
+        return pageRef;        
+    }
+}

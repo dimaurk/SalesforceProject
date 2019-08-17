@@ -1,0 +1,61 @@
+@isTest
+public class NewContactControllerTestSuite 
+{
+    @isTest
+    static void Param()
+    {
+        // создание и вставка нового аккаунта
+      Account defaultAccount = new Account(name = 'Test Account');
+        insert defaultAccount;
+        // создание и вставка контктов
+      List<Contact> Cont = new List<Contact>();
+        
+        for(Integer i=0; i<5; i++)
+        {
+            Cont.add(new Contact(lastname='lastname'+i, accountid = defaultAccount.id));
+        }
+        insert Cont;
+        // проверки вставки контактов
+      List<Contact> contacts = [SELECT Id, lastName FROM CONTACT];
+        System.assertEquals(5, contacts.size());
+    }
+    @isTest
+    static void SaveNewContact()
+    {
+        	// подготовка текущего параметра страницы и повтора для перенаправления
+      PageReference Ref = Page.NewContact;
+        Test.setCurrentPageReference(Ref);
+          ApexPages.currentPage().getHeaders().put('Referer','Contact Manager');
+        	// создать новую учетную запись и вставить ее
+      Account defaultAccount = new Account(name = 'Test Account');
+        insert defaultAccount;
+        	// Создать новый контакт
+      Contact defaultContact = new Contact(lastname='lastname', accountid = defaultAccount.id);
+        	// создать экземпляр DefaultController
+      ApexPages.StandardController defaultStandardController = new ApexPages.StandardController(defaultContact);
+        	// создать экземпляр NewContactController
+      NewContactController NewConContr = new NewContactController(defaultStandardController);
+        	// сохранить новый контакт
+      NewConContr.ContactSave();
+        	// проверка достоверности результатов
+      List<Contact> result = [Select id, lastname FROM Contact where lastname=:defaultContact.lastName];
+        System.assertEquals(1, result.size());
+    }
+    @isTest
+    static void CancelNewContact()
+    {
+        	// подготовка текущего параметра страницы и повтора для перенаправления
+      PageReference Ref = Page.NewContact;
+       Test.setCurrentPageReference(Ref);
+        ApexPages.currentPage().getHeaders().put('Referer','ContactManager');
+         Contact defaultContact = new Contact(lastname='lastname');
+        
+       ApexPages.StandardController defaultStandardController = new ApexPages.StandardController(defaultContact);
+        NewContactController NewConContr = new NewContactController(defaultStandardController);  
+         NewConContr.PageCancel();
+        
+        	// проверка достоверности результатов
+      List<Contact> result = [Select id, lastname FROM Contact where lastname=:defaultContact.lastName];
+        System.assertEquals(0, result.size());
+    }
+}

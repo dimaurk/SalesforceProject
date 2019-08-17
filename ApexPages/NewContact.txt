@@ -1,0 +1,22 @@
+<apex:page standardController="Contact" extensions="NewContactController">
+	<apex:sectionHeader title="Contact" subtitle="Contact Manager" />
+   	<apex:form >
+    	<apex:pageBlock title="New Contact">
+
+    		<apex:pageBlockSection title="Contact Information" collapsible="false">
+     			<apex:inputField value="{!Contact.FirstName}"/>
+     			<apex:inputField value="{!Contact.LastName}" required="true"/>
+     			<apex:inputField value="{!Contact.Email}" required="true"/>
+     			<apex:inputField value="{!Contact.Contact_Level__c}"/>
+        		<apex:inputField value="{!Contact.AccountId}"/>   
+     		</apex:pageBlockSection>
+
+	 		<apex:pageBlockButtons location="bottom">
+     			<apex:commandButton action="{!ContactSave}" value="Save" />
+        		<apex:commandButton action="{!PageCancel}" value="Cancel" html-formnovalidate="formnovalidate" 
+                                    onclick="if(!confirm('Leave the page?')){return false};" />
+     		</apex:pageBlockButtons>
+            
+    	</apex:pageBlock>
+	</apex:form>
+</apex:page>

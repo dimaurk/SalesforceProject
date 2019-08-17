@@ -1,0 +1,10 @@
+trigger ContactTrigger on Contact (before insert) {
+/*
+    List<Contact> NameCon = [SELECT Name FROM Contact WHERE Name = :Trigger.new[0]Name];
+    
+    if (NameCon.isEmpty() == false)
+    {
+      Trigger.new[0].addError('Incorrect Name')  
+    }
+*/
+}

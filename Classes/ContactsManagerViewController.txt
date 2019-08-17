@@ -1,0 +1,163 @@
+public class ContactsManagerViewController 
+{
+    
+    public Integer total { get; set; }
+    
+    public ContactsManagerViewController()
+    {	//количество записей в таблице Contact
+        total = [select count() from Contact];
+    }
+		//Сортировка по колонкам
+    public String sortingColumn = 'Name';
+    public String sortingOrder = ' ASC ';
+    public String column = sortingColumn;
+     
+    public String con = 'SELECT Id, Name, Email, Contact_Level__c, AccountId, OwnerId, CreatedById, CreatedDate ' +
+                        'FROM Contact ' + 'ORDER BY ' + sortingColumn + sortingOrder;
+ 
+        public void sortByName() 
+        {
+            sortingColumn = 'Name';
+            sortingOrder();
+        }
+        public void sortByEmail() 
+        {
+            sortingColumn = 'Email';
+            sortingOrder();
+        }
+        public void sortByContactLevel() 
+        {
+            sortingColumn = 'Contact_Level__c';
+            sortingOrder();
+        }
+        public void sortByAccountId() 
+        {
+            sortingColumn = 'AccountId';
+            sortingOrder();
+        }
+        public void sortByOwnerId() 
+        {
+            sortingColumn = 'OwnerId';
+            sortingOrder();
+        }
+        public void sortByCreatedById() 
+        {
+            sortingColumn = 'CreatedById';
+            sortingOrder();
+        }
+        public void sortByCreatedDate() 
+        {
+            sortingColumn = 'CreatedDate';
+            sortingOrder();
+        }
+ 
+    public void sortingOrder() 
+    {
+        if (sortingColumn == column) 
+        {
+            sortingOrder = (sortingOrder == ' ASC ') ? ' DESC ' : ' ASC ';
+        } 
+        else 
+        {
+            sortingOrder = ' ASC ';
+            column = sortingColumn;
+        }
+        con = 'SELECT Id, Name, Email, Contact_Level__c, AccountId, OwnerId, CreatedById, CreatedDate ' +
+              'FROM Contact ' + 'ORDER BY ' + sortingColumn + sortingOrder;
+     
+        setList = new ApexPages.StandardSetController(Database.query(con));
+    }
+ 
+    	//пагинация
+      public list<SelectOption> getPageSizeList()
+      	{
+      	list<SelectOption> rows = new list<SelectOption>();
+          
+      		rows.add(new selectOption('10','10'));
+      		rows.add(new selectOption('15','15'));
+      		rows.add(new selectOption('20','20'));
+          
+      		return rows;
+        }
+    
+        public ApexPages.StandardSetController setList 
+        {
+            get 
+            {
+                if (setList == null) 
+                {
+                    setList = new ApexPages.StandardSetController(Database.query(con));
+                }
+                if (this.PageSize == null) PageSize = 10;
+                setList.setPageSize(PageSize);
+                return setList;
+            } set;
+    	}
+    
+        public Integer PageSize 
+        {
+            get; set 
+            { 
+              if(value != null) this.PageSize = value; 
+            }
+        }
+
+        public void conUpdate() 
+        {
+        	con = 'SELECT Id, Name, Email, Contact_Level__c, AccountId, OwnerId, CreatedById, CreatedDate ' +
+                  'FROM Contact ' + 'ORDER BY ' + sortingColumn +' '+ sortingOrder;
+            
+        	setList = new ApexPages.StandardSetController(Database.query(con));
+		}
+    
+    	// Поиск по имени контакта
+	public String Strsearch {get; set;}
+	public void getSearch()
+    {
+        String searchByName = '\'' + Strsearch + '%\'';
+        con = 'SELECT Id, Name, Email, Contact_Level__c, AccountId, OwnerId, CreatedById, CreatedDate ' +
+        	  'FROM Contact ' + 'WHERE Name like ' + searchByName + ' ' + 
+              'ORDER BY ' + sortingColumn +' '+ sortingOrder;
+
+		setList = new ApexPages.StandardSetController(Database.query(con));
+	}
+    
+    public string SelectedContact { get; set; }
+    public void DeleteContact()
+    {
+        if (SelectedContact == null) 
+        { 
+            return; 
+        }
+
+        Contact tobeDeleted = null;
+        for (Contact del : [SELECT Id FROM Contact])
+            if (del.Id == SelectedContact) 
+        {
+                tobeDeleted = del;
+                break;
+        }
+     
+        if (tobeDeleted != null) 
+        { 
+            Delete tobeDeleted; 
+        } 
+        conUpdate();
+        getContact(); 
+    }
+  
+    	//перенаправление на страницу создания нового контакта
+ 	private String NewCon = '/apex/NewContact';
+    public PageReference newContact()
+    {
+    	PageReference pageRef = new PageReference(NewCon);
+    	pageRef.setRedirect(true);  
+        return pageRef;
+    }
+    	
+        public List<Contact> getContact() 
+    { 
+        return (List<Contact>) setList.getRecords();
+	}
+     
+}
