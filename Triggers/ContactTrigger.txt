@@ -8,4 +8,3 @@ trigger ContactTrigger on Contact (before insert) {
     }
 */
 }
-test branch and merge
